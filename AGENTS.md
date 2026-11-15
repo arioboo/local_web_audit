@@ -14,7 +14,7 @@ Lightweight pentesting and status review of the local web, on macOS (Darwin arm6
 AGENTS.md            single source of instructions (CLAUDE.md only contains `@AGENTS.md`)
 latest_report.md     relative symlink → .claude/reports/latest/report.md (latest report; follows `latest`)
 latest_recommendations.md  relative symlink → .claude/reports/latest/recommendations.md (latest run's recommendations)
-requirements.txt     no pip dependencies (comments only); system tools are listed under "Tools"
+requirements.txt     no pip dependencies (comments only); system tools are listed under "Tools"; `bundle.py` uses only the Python standard library
 README.md            user guide (scope, usage, how to read the report); keep aligned with this file
 localhost/           loopback notes and manual tests (empty)
 lan/  web/           reserved, empty, out of scope
@@ -23,9 +23,10 @@ lan/  web/           reserved, empty, out of scope
 .claude/
   settings.json      project permissions (allow/ask/deny) and hooks; settings.local.json (personal, ignored)
   agents/ commands/ skills/ rules/ hooks/ output-styles/   reviewer/explorer, /review /commit /pr /bundle, rules, pre-bash-guard and post-edit-format
-  recommendations/   toolset.md and other recommendations (Spanish)
-  scripts/           audit, one script per utility (+ lib/common.sh)
+  recommendations/   toolset.md, guia_gh_github.md (gh and GitHub quick guide) and other recommendations/guides (Spanish)
+  scripts/           audit, one script per utility (+ lib/common.sh); bundle.py + bundle_template.html build the bundle page
   reports/<ts>/      one run: report.md + logs/ (raw evidence); `latest` → latest run
+  reports/bundle.html   local bundle page (git-ignored), published as the container artifact
   notes/             tools.md (tools and PATH), review-2026-11-15.md, first-audit-checklist.md, decisions.md, todo.md, artifact.md
 ```
 - `/Users/arl94/Claude/local_web_audit` is a symlink to this directory; printed paths may come out under either.
@@ -40,6 +41,8 @@ lan/  web/           reserved, empty, out of scope
 cat latest_report.md                              # read the latest report (symlink at the root)
 tail -f .claude/reports/latest/logs/audit.log     # execution log
 .claude/scripts/diff_runs.sh [RUN_A RUN_B]        # exposure changes (default: the last two)
+python3 -I .claude/scripts/bundle.py              # rebuild .claude/reports/bundle.html (all reports, recommendations, guides)
+open .claude/reports/bundle.html                  # open the bundle locally (always do this after a rebuild)
 # verification (no tests): syntax and lint
 cd .claude/scripts && for f in *.sh lib/common.sh; do /bin/bash -n "$f"; done && shellcheck -x -S warning *.sh lib/common.sh
 ```
@@ -60,6 +63,7 @@ Default ports: `80,443,3000,5000,5173,7000,8000,8080,8443`. A run takes ~30 s (`
 | `nse.sh` | `HOST PORT LOGS` | nmap with a read-only NSE allowlist (with `+`, forced even if nmap does not see http): `port_N/nse.txt` |
 | `diff_runs.sh` | `[A B]` | differences (`ncat_ports`, `owners`, `listening`) between runs (optional, `--diff`): `diff_prev.txt` |
 | `report.sh` | `RUN_DIR HOST PORTS` | builds `report.md` from `logs/` |
+| `bundle.py` | none | Python (stdlib only, not part of `audit.sh`): converts every `.claude/recommendations/*.md` and `reports/*/{report,recommendations}.md` into `reports/bundle.html` using `bundle_template.html` |
 
 `lib/common.sh` (sourced with `.`) provides `log`, `require_loopback`, `validate_ports` (CSV list 1-65535, no leading zeros) and `url_host` (IPv6 in brackets). Each script can run on its own and revalidates host and ports. `report.sh` depends on the file names under `logs/port_N/`: a new check must write there and add its section to `report.sh`.
 
@@ -109,11 +113,18 @@ When the user asks for recommendations (read-only; runs nothing new against the 
 ## Language and format
 - English: all code (including script comments, usage and `log` messages), this file, `README.md`, everything under `.claude/` except reports and recommendations, `.github/`, and every git/GitHub operation (commits, branches, PRs, issues).
 - Spanish: reports (`.claude/reports/`, including the evidence text the scripts write into `logs/` and `report.sh` output) and recommendations (`.claude/recommendations/`), and replies to the user.
-- Markdown by default; PDF or DOCX only on request. `/bundle` refreshes the container artifact (URL in `.claude/notes/artifact.md`) with all reports and recommendations.
+- Markdown by default; PDF or DOCX only on request.
+
+## Bundle and artifact
+- The container artifact gathers every report, recommendation and guide in one page (URL in `.claude/notes/artifact.md`, private).
+- `/bundle` rebuilds it: run `bundle.py`, republish `.claude/reports/bundle.html` to that URL, then **always open the local HTML file** (`open .claude/reports/bundle.html`), not just the link.
+- Adding a guide or recommendation: write the `.md` in `.claude/recommendations/` (Spanish), then run `/bundle`. New groups need an `add(...)` line in `bundle.py`.
+- `guia_gh_github.md` covers `gh` login, branches, PRs, issues, Actions and repo safety; `gh` has no session on this machine until the user runs `! gh auth login`.
 
 ## Pending
 - First real audit: follow `.claude/notes/first-audit-checklist.md`.
 - Test `cookies_cors.sh`, `nse.sh` and `tls.sh` against a real app (tested only with test http/https servers and AirPlay).
 - Review findings still unfixed: `tls.sh` has no timeout or pre-check, `owners.sh` skips ports `lsof` cannot see, stale `audit.sh` header, the `audit.sh` `ask` rule that shadows the `allow` rules, `nse.sh` overlap with other scripts. Also: `pre-bash-guard.sh` matches substrings anywhere in the command (too broad).
+- `bundle.py` has a hand-written Markdown converter (headings, tables, lists, code, bold/inline code only); switch to a library if richer Markdown is needed.
 - Integrate `testssl.sh`/`sslscan`/`nikto` into `audit.sh` (optional via flag).
 - `--watch` mode with `ncat`/`cron` for periodic availability in `.claude/reports/uptime.log`.

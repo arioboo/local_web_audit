@@ -43,6 +43,8 @@ Two shortcuts at the root always point to the latest run:
 - `latest_report.md`: the report.
 - `latest_recommendations.md`: prioritized recommendations, generated on request (see `AGENTS.md`, "recomienda" procedure).
 
+To read everything in one place, run `python3 -I .claude/scripts/bundle.py` and open `.claude/reports/bundle.html`. It gathers all reports, recommendations and guides (including `.claude/recommendations/guia_gh_github.md`, a short guide to `gh` and GitHub for this repo). In Claude Code, `/bundle` does it and also refreshes the private container artifact.
+
 These links are broken until the first run: run `audit.sh` once and they fix themselves. `reports/` is in `.gitignore`.
 
 ## How to read the report
@@ -58,6 +60,13 @@ Pay particular attention to:
 On macOS, ports `5000` and `7000` are held by **ControlCenter**, the AirPlay receiver (`Server: AirTunes/…`). It answers `403` to everything, so the report will flag every path as "sensitive" and every security header as missing. That is noise. nmap also mislabels them (`rtsp`, `upnp`). They listen on all interfaces; if you do not use AirPlay, turn off "AirPlay Receiver" in System Settings → General → AirDrop & Handoff.
 
 Another one: `code=000` with 5 s on HTTPS only means the port does not speak TLS.
+
+## Claude Code setup
+
+- `AGENTS.md` holds the instructions; `CLAUDE.md` only points to it.
+- `.claude/` has the permissions and hooks (`settings.json`), subagents (`reviewer`, `explorer`), commands (`/review`, `/commit`, `/pr`, `/bundle`), rules, and the recommendations folder.
+- `.github/` has CI (`bash -n` and `shellcheck`), issue and PR templates, `CODEOWNERS` and Dependabot.
+- Language: code, docs and git/GitHub in English; reports and recommendations in Spanish.
 
 ## How it is built
 

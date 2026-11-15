@@ -1,7 +1,9 @@
 # local_web_audit: Python dependencies
-# None. The project is pure Bash; this file exists only by convention
+# None. The project is Bash plus one stdlib-only Python script; this file exists only by convention
 # and so that `pip install -r requirements.txt` does not fail.
 #
 # Required system tools (not installable with pip): ncat, nmap,
 # curl, openssl, lsof, netstat. Optional: docker, shellcheck, testssl.sh,
 # sslscan, nikto, mitmproxy. Inventory in AGENTS.md and .claude/notes/tools.md.
+#
+# .claude/scripts/bundle.py needs python3 (standard library only).

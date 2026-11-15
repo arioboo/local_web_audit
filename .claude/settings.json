@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.claude/scripts/audit.sh)",
+      "Bash(.claude/scripts/audit.sh 127.0.0.1:*)",
+      "Bash(.claude/scripts/audit.sh localhost:*)",
+      "Bash(bash -n .claude/scripts/audit.sh)",
+      "Bash(lsof -iTCP -sTCP:LISTEN -nP)",
+      "Bash(netstat -an -p tcp)",
+      "Read(.claude/reports/**)",
+      "Read(.claude/scripts/**)",
+      "Bash(.claude/scripts/owners.sh:*)",
+      "Bash(.claude/scripts/diff_runs.sh:*)",
+      "Bash(.claude/scripts/containers.sh:*)",
+      "Bash(.claude/scripts/sockets.sh:*)",
+      "Bash(.claude/scripts/report.sh:*)"
+    ],
+    "ask": [
+      "Bash(nmap:*)",
+      "Bash(ncat:*)",
+      "Bash(curl:*)",
+      "Bash(openssl s_client:*)",
+      "Bash(.claude/scripts/audit.sh:*)",
+      "Bash(.claude/scripts/ports.sh:*)",
+      "Bash(.claude/scripts/http.sh:*)",
+      "Bash(.claude/scripts/tls.sh:*)",
+      "Bash(.claude/scripts/nse.sh:*)",
+      "Bash(.claude/scripts/cookies_cors.sh:*)"
+    ],
+    "deny": [
+      "Bash(brew install:*)",
+      "Bash(brew upgrade:*)"
+    ]
+  }
+}

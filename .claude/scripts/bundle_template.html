@@ -1,0 +1,67 @@
+<title>Informes local_web_audit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: fixed index rail on the left, one reading column of reports and recommendations on the right; rail collapses above the content on phones. */
+:root {
+  --bg: #f6f7f8;
+  --surface: #ffffff;
+  --fg: #1c2430;
+  --muted: #5b6675;
+  --line: #d9dee4;
+  --accent: #0b6b6b;
+  --code-bg: #eef1f4;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171d; --surface: #1a212a; --fg: #e3e8ee; --muted: #96a1af;
+    --line: #2c3541; --accent: #4fc3bd; --code-bg: #222b36; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171d; --surface: #1a212a; --fg: #e3e8ee; --muted: #96a1af;
+  --line: #2c3541; --accent: #4fc3bd; --code-bg: #222b36; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { display: flex; gap: 32px; max-width: 1180px; margin: 0 auto; padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav { flex: 0 0 240px; position: sticky; top: 24px; align-self: flex-start; max-height: calc(100vh - 48px); overflow-y: auto; }
+nav h1 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+nav .sub { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+nav .grp { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 16px 0 4px; }
+nav a { display: block; padding: 4px 8px; margin-left: -8px; border-radius: 4px; color: var(--fg); text-decoration: none; font-size: 13px; overflow-wrap: anywhere; }
+nav a:hover, nav a:focus-visible { background: var(--code-bg); color: var(--accent); outline: none; }
+main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+section { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 24px 20px; min-width: 0; scroll-margin-top: 16px; }
+.kicker { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 16px 0 0; }
+h2 { font-size: 20px; margin: 4px 0 12px; text-wrap: balance; }
+h3 { font-size: 16px; margin: 20px 0 8px; } h4, h5 { font-size: 14px; margin: 16px 0 6px; }
+p, li { max-width: 72ch; }
+ul, ol { padding-left: 22px; }
+code { font-family: var(--font-mono); font-size: 12.5px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+pre { margin: 0; padding: 12px 14px; background: var(--code-bg); border-radius: 4px; }
+pre code { background: none; padding: 0; font-size: 12px; line-height: 1.5; }
+.scroll { overflow-x: auto; margin: 8px 0 12px; }
+table { border-collapse: collapse; font-size: 13px; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+th { font-weight: 600; color: var(--muted); white-space: nowrap; }
+blockquote { margin: 8px 0; padding-left: 12px; border-left: 3px solid var(--line); color: var(--muted); }
+a:focus-visible { outline: 2px solid var(--accent); }
+@media (max-width: 760px) {
+  .wrap { flex-direction: column; gap: 16px; }
+  nav { position: static; flex: none; max-height: none; }
+  section { padding: 4px 14px 16px; }
+}
+</style>
+<div class="wrap">
+  <nav aria-label="Índice">
+    <h1>local_web_audit</h1>
+    <p class="sub">@@N@@ documentos · actualizado a @@DATE@@ · solo loopback</p>
+    @@NAV@@
+  </nav>
+  <main>
+@@BODY@@
+  </main>
+</div>

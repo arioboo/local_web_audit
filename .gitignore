@@ -3,3 +3,27 @@ reports/
 .claude/settings.json
 .claude/settings.local.json
 .claude/notes/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Claude Code: user-level and local state
+CLAUDE.local.md
+AGENTS.local.md
+.claude/*.local.*
+.claude/worktrees/
+.claude/projects/
+.claude/todos/
+.claude/shell-snapshots/
+.claude/statsig/
+.claude/ide/
+.mcp.local.json
+
+# Editor
+.idea/
+.vscode/*
+!.vscode/settings.json
+
+# User-level items detected in this project: none (no .claude/skills|agents|commands entry links to ~/.claude)

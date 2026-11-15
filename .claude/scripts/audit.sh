@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Auditoría ligera de la web local (solo loopback). Orquesta los scripts por utilidad
-# (sockets, ports, http, tls, report) y escribe en reports/<timestamp>/.
-# Uso: scripts/audit.sh [host] [puertos_csv]
-#   host     por defecto 127.0.0.1 (solo loopback)
-#   puertos  por defecto: 80,443,3000,5000,5173,7000,8000,8080,8443
-#   --containers  añade los contenedores Docker con puertos publicados
-#   --diff        compara con el run anterior (cambios de exposición)
+# Lightweight audit of the local web (loopback only). Orchestrates the per-utility scripts
+# (sockets, ports, http, tls, report) and writes to reports/<timestamp>/.
+# Usage: scripts/audit.sh [host] [puertos_csv]
+#   host     default 127.0.0.1 (loopback only)
+#   ports    default: 80,443,3000,5000,5173,7000,8000,8080,8443
+#   --containers  adds Docker containers with published ports
+#   --diff        compares with the previous run (exposure changes)
 set -u
 DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$DIR/lib/common.sh"
@@ -30,7 +30,7 @@ OUT="$REPORTS/$TS"; n=0
 while ! mkdir "$OUT" 2>/dev/null; do n=$((n+1)); OUT="$REPORTS/$TS-$n"; done
 LOGS="$OUT/logs"; mkdir -p "$LOGS"
 
-log "Sockets TCP en escucha"
+log "Listening TCP sockets"
 "$DIR/sockets.sh" "$LOGS"
 "$DIR/ports.sh" "$HOST" "$PORTS" "$LOGS"
 "$DIR/owners.sh" "$LOGS"
@@ -48,5 +48,5 @@ if [ "$WITH_DIFF" = 1 ]; then
 fi
 
 "$DIR/report.sh" "$OUT" "$HOST" "$PORTS"
-ln -sfn "$(basename "$OUT")" "$REPORTS/latest"   # solo al terminar: latest siempre tiene report.md
-log "Hecho. Informe: $OUT/report.md"
+ln -sfn "$(basename "$OUT")" "$REPORTS/latest"   # only at the end: latest always has report.md
+log "Done. Report: $OUT/report.md"

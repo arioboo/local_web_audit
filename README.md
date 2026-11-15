@@ -1,72 +1,72 @@
 # local_web_audit
 
-Un kit pequeño para echar un vistazo rápido a lo que tu Mac está sirviendo en local: qué puertos hay abiertos, quién los tiene, qué responde cada uno y si algo huele raro. Es pentesting ligero, solo reconocimiento y comprobaciones de configuración. No rompe nada ni explota nada.
+A small kit to take a quick look at what your Mac is serving locally: which ports are open, who owns them, what each one answers and whether anything looks off. It is lightweight pentesting: reconnaissance and configuration checks only. It breaks nothing and exploits nothing.
 
-## Qué hace (y qué no)
+## What it does (and does not)
 
-- **Solo loopback**: `127.0.0.1`, `localhost` y `::1`. Si pasas otro host, los scripts se niegan a ejecutarse. Es a propósito.
-- **Solo lectura**: peticiones `GET`, `HEAD`, `OPTIONS` y `TRACE`. Nada de `POST`/`PUT`/`DELETE`, fuzzing, fuerza bruta ni DoS.
-- **No instala nada** ni pide `sudo`.
+- **Loopback only**: `127.0.0.1`, `localhost` and `::1`. If you pass any other host, the scripts refuse to run. This is on purpose.
+- **Read-only**: `GET`, `HEAD`, `OPTIONS` and `TRACE` requests. No `POST`/`PUT`/`DELETE`, fuzzing, brute force or DoS.
+- **Installs nothing** and never asks for `sudo`.
 
-## Requisitos
+## Requirements
 
-macOS con `bash` 3.2, y `ncat`, `nmap`, `curl`, `openssl`, `lsof` y `netstat` en el `PATH`. `docker` es opcional y solo hace falta con `--containers`. Para desarrollar, `shellcheck`.
+macOS with `bash` 3.2, and `ncat`, `nmap`, `curl`, `openssl`, `lsof` and `netstat` in the `PATH`. `docker` is optional and only needed with `--containers`. For development, `shellcheck`.
 
-## Uso rápido
+## Quick start
 
 ```bash
-.claude/scripts/audit.sh                          # 127.0.0.1 con los puertos por defecto
-.claude/scripts/audit.sh localhost 3000,8080      # puertos concretos (lista CSV, sin rangos)
+.claude/scripts/audit.sh                          # 127.0.0.1 with the default ports
+.claude/scripts/audit.sh localhost 3000,8080      # specific ports (CSV list, no ranges)
 .claude/scripts/audit.sh 127.0.0.1 3000 --diff --containers
-cat latest_report.md                              # leer el último informe
+cat latest_report.md                              # read the latest report
 ```
 
-Puertos por defecto: `80,443,3000,5000,5173,7000,8000,8080,8443`.
-Un run tarda unos 30 s, más unos 20 s por cada puerto abierto (el análisis NSE es lo que más pesa).
+Default ports: `80,443,3000,5000,5173,7000,8000,8080,8443`.
+A run takes about 30 s, plus about 20 s per open port (the NSE analysis is the heaviest part).
 
-| Flag | Efecto |
+| Flag | Effect |
 |---|---|
-| `--diff` | compara con el run anterior y anota los cambios de exposición |
-| `--containers` | añade los contenedores Docker con puertos publicados |
+| `--diff` | compares with the previous run and notes exposure changes |
+| `--containers` | adds Docker containers with published ports |
 
-Para comparar dos runs cualesquiera: `.claude/scripts/diff_runs.sh [RUN_A RUN_B]` (por defecto, los dos últimos).
+To compare any two runs: `.claude/scripts/diff_runs.sh [RUN_A RUN_B]` (default: the last two).
 
-## Qué te llevas
+## What you get
 
-Cada run crea `.claude/reports/<timestamp>/` con:
+Each run creates `.claude/reports/<timestamp>/` with:
 
-- `report.md`: el informe legible, con una sección por comprobación.
-- `logs/`: la evidencia cruda (salida de `nmap`, `curl`, certificados, etc.) y `audit.log` para seguir la ejecución con `tail -f`.
+- `report.md`: the readable report, one section per check (written in Spanish).
+- `logs/`: the raw evidence (`nmap`, `curl` output, certificates, etc.) and `audit.log` to follow the run with `tail -f`.
 
-Dos atajos en la raíz siempre apuntan al último run:
+Two shortcuts at the root always point to the latest run:
 
-- `latest_report.md`: el informe.
-- `latest_recommendations.md`: recomendaciones priorizadas. Se generan a petición (ver `AGENTS.md`, «Procedimiento "recomienda"»).
+- `latest_report.md`: the report.
+- `latest_recommendations.md`: prioritized recommendations, generated on request (see `AGENTS.md`, "recomienda" procedure).
 
-Estos enlaces se rompen si aún no hay ningún run: ejecuta `audit.sh` una vez y se arreglan solos. `reports/` está en `.gitignore`.
+These links are broken until the first run: run `audit.sh` once and they fix themselves. `reports/` is in `.gitignore`.
 
-## Cómo leer el informe
+## How to read the report
 
-Fíjate sobre todo en:
+Pay particular attention to:
 
-- **Dueño del puerto**: `EXPUESTO(todas-las-interfaces)` significa que escucha en `*`, y por tanto es accesible desde tu red, no solo desde tu máquina.
-- **Cabeceras, métodos y cookies**: `Server`/`X-Powered-By` que filtren versión, `TRACE` que no devuelva 405/403, métodos de escritura en `Allow`, cookies sin `HttpOnly`/`Secure`/`SameSite`, CORS `*` o que refleje el `Origin`.
-- **Rutas sensibles**: un `200`/`301`/`302` en `/.env`, `/.git/*` o `/admin` merece atención inmediata.
+- **Port owner**: `EXPUESTO(todas-las-interfaces)` means it listens on `*`, so it is reachable from your network, not just your machine.
+- **Headers, methods and cookies**: `Server`/`X-Powered-By` leaking versions, `TRACE` not returning 405/403, write methods in `Allow`, cookies without `HttpOnly`/`Secure`/`SameSite`, CORS `*` or reflecting the `Origin`.
+- **Sensitive paths**: a `200`/`301`/`302` on `/.env`, `/.git/*` or `/admin` deserves immediate attention.
 
-### Falsos positivos conocidos
+### Known false positives
 
-En macOS, los puertos `5000` y `7000` los ocupa **ControlCenter**, el receptor AirPlay (`Server: AirTunes/…`). Responde `403` a todo, así que el informe marcará todas las rutas como «sensibles» y todas las cabeceras de seguridad como ausentes. Es ruido. Además, nmap los etiqueta mal (`rtsp`, `upnp`). Escuchan en todas las interfaces; si no usas AirPlay, desactiva «Receptor de AirPlay» en Ajustes del Sistema → General → AirDrop y Handoff.
+On macOS, ports `5000` and `7000` are held by **ControlCenter**, the AirPlay receiver (`Server: AirTunes/…`). It answers `403` to everything, so the report will flag every path as "sensitive" and every security header as missing. That is noise. nmap also mislabels them (`rtsp`, `upnp`). They listen on all interfaces; if you do not use AirPlay, turn off "AirPlay Receiver" in System Settings → General → AirDrop & Handoff.
 
-Otro: `code=000` con 5 s en HTTPS solo significa que el puerto no habla TLS.
+Another one: `code=000` with 5 s on HTTPS only means the port does not speak TLS.
 
-## Cómo está montado
+## How it is built
 
-`audit.sh` es el orquestador. Llama, en orden, a un script por utilidad (`sockets`, `ports`, `owners`, `http`, `tls`, `cookies_cors`, `nse`, `report`...). Todos viven en `.claude/scripts/`, comparten `lib/common.sh` y se pueden ejecutar por separado: cada uno revalida host y puertos por su cuenta. Si añades una comprobación, deja su salida cruda en `logs/` y su resumen en `report.sh`.
+`audit.sh` is the orchestrator. It calls, in order, one script per utility (`sockets`, `ports`, `owners`, `http`, `tls`, `cookies_cors`, `nse`, `report`...). They all live in `.claude/scripts/`, share `lib/common.sh` and can run on their own: each one revalidates host and ports by itself. If you add a check, leave its raw output in `logs/` and its summary in `report.sh`.
 
-Antes de tocar scripts:
+Before touching scripts:
 
 ```bash
 cd .claude/scripts && for f in *.sh lib/common.sh; do /bin/bash -n "$f"; done && shellcheck -x -S warning *.sh lib/common.sh
 ```
 
-Las reglas de alcance y las convenciones completas están en [`AGENTS.md`](AGENTS.md).
+Scope rules and full conventions are in [`AGENTS.md`](AGENTS.md).

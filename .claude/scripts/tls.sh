@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Certificado TLS de un puerto, solo si https respondió (requiere http.sh antes). Uso: tls.sh HOST PUERTO LOGS_DIR
+# TLS certificate of a port, only if https answered (requires http.sh first). Usage: tls.sh HOST PORT LOGS_DIR
 set -u
 . "$(dirname "$0")/lib/common.sh"
-HOST="${1:?uso: tls.sh HOST PUERTO LOGS_DIR}"; PORT="${2:?}"; LOGS="${3:?}"
+HOST="${1:?usage: tls.sh HOST PORT LOGS_DIR}"; PORT="${2:?}"; LOGS="${3:?}"
 require_loopback "$HOST"; validate_ports "$PORT"
 D="$LOGS/port_$PORT"
 

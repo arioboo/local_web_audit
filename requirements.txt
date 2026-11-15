@@ -1,7 +1,7 @@
-# local_web_audit: dependencias de Python
-# Ninguna. El proyecto es Bash puro; este fichero existe solo por convención
-# y para que `pip install -r requirements.txt` no falle.
+# local_web_audit: Python dependencies
+# None. The project is pure Bash; this file exists only by convention
+# and so that `pip install -r requirements.txt` does not fail.
 #
-# Herramientas de sistema necesarias (no instalables con pip): ncat, nmap,
-# curl, openssl, lsof, netstat. Opcionales: docker, shellcheck, testssl.sh,
-# sslscan, nikto, mitmproxy. Inventario en AGENTS.md y .claude/notes/tools.md.
+# Required system tools (not installable with pip): ncat, nmap,
+# curl, openssl, lsof, netstat. Optional: docker, shellcheck, testssl.sh,
+# sslscan, nikto, mitmproxy. Inventory in AGENTS.md and .claude/notes/tools.md.

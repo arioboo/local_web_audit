@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Proceso dueño de cada puerto abierto y en qué interfaces escucha. Uso: owners.sh LOGS_DIR
-# Requiere LOGS_DIR/open_ports.txt (ports.sh). Salida: LOGS_DIR/owners.txt (puerto proceso pid bind exposición).
+# Owning process of each open port and the interfaces it listens on. Usage: owners.sh LOGS_DIR
+# Requires LOGS_DIR/open_ports.txt (ports.sh). Output: LOGS_DIR/owners.txt (port process pid bind exposure).
 set -u
 . "$(dirname "$0")/lib/common.sh"
-LOGS="${1:?uso: owners.sh LOGS_DIR}"
+LOGS="${1:?usage: owners.sh LOGS_DIR}"
 : > "$LOGS/owners.txt"
 
-log "Dueño de cada puerto abierto"
+log "Owner of each open port"
 while IFS= read -r p <&3; do
   lsof -nP -iTCP:"$p" -sTCP:LISTEN -Fpcn 2>/dev/null | awk -v port="$p" '
     /^p/ { pid = substr($0, 2) }

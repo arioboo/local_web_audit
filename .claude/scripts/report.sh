@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Genera report.md a partir de la evidencia de logs/. Uso: report.sh RUN_DIR HOST PUERTOS_CSV
+# Generates report.md from the evidence in logs/. Usage: report.sh RUN_DIR HOST PORTS_CSV
 set -u
 . "$(dirname "$0")/lib/common.sh"
-OUT="${1:?uso: report.sh RUN_DIR HOST PUERTOS_CSV}"; HOST="${2:?}"; PORTS="${3:?}"
+OUT="${1:?usage: report.sh RUN_DIR HOST PORTS_CSV}"; HOST="${2:?}"; PORTS="${3:?}"
 LOGS="$OUT/logs"; REPORT="$OUT/report.md"
 OPEN_LIST="$(tr '\n' ' ' < "$LOGS/open_ports.txt" 2>/dev/null)"
 
-log "Generando informe $REPORT"
+log "Generating report $REPORT"
 {
   echo "# Informe de auditoría local — $(basename "$OUT")"
   echo

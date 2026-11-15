@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Comprobaciones HTTP de un puerto: banner, cabeceras, métodos (solo lectura) y rutas sensibles.
-# Uso: http.sh HOST PUERTO LOGS_DIR   -> LOGS_DIR/port_PUERTO/
+# HTTP checks for a port: banner, headers, methods (read-only) and sensitive paths.
+# Usage: http.sh HOST PORT LOGS_DIR   -> LOGS_DIR/port_PORT/
 set -u
 . "$(dirname "$0")/lib/common.sh"
-HOST="${1:?uso: http.sh HOST PUERTO LOGS_DIR}"; PORT="${2:?}"; LOGS="${3:?}"
+HOST="${1:?usage: http.sh HOST PORT LOGS_DIR}"; PORT="${2:?}"; LOGS="${3:?}"
 require_loopback "$HOST"; validate_ports "$PORT"
 U="$(url_host "$HOST"):$PORT"
 D="$LOGS/port_$PORT"; mkdir -p "$D"
@@ -12,7 +12,7 @@ SENSITIVE=(/.env /.git/config /.git/HEAD /.DS_Store /robots.txt /sitemap.xml /se
 
 code() { curl -sk -m 5 -o /dev/null -w '%{http_code}' "$@" 2>/dev/null; }
 
-log "Puerto $PORT: banner y HTTP"
+log "Port $PORT: banner and HTTP"
 printf 'HEAD / HTTP/1.0\r\nHost: %s\r\n\r\n' "$HOST" | ncat -w 3 "$HOST" "$PORT" > "$D/ncat_banner.txt" 2>&1
 
 for scheme in http https; do
@@ -21,7 +21,7 @@ for scheme in http https; do
     "$scheme://$U/" > "$D/timing_$scheme.txt" 2>&1
 done
 
-# Esquema efectivo: el primero que respondió (no 000). Métodos y rutas se prueban solo por ese.
+# Effective scheme: the first that answered (not 000). Methods and paths are tested only over it.
 SCHEME=none
 for s in http https; do
   grep -q '^code=000' "$D/timing_$s.txt" || { SCHEME=$s; break; }
@@ -33,7 +33,7 @@ if [ "$SCHEME" = none ]; then
   exit 0
 fi
 
-# Métodos: solo sin efectos secundarios. Los de escritura se deducen de la cabecera Allow.
+# Methods: side-effect-free only. Write methods are inferred from the Allow header.
 {
   echo "GET $(code "$BASE/")"
   echo "HEAD $(code -I "$BASE/")"

@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check
+        run: cd .claude/scripts && for f in *.sh lib/common.sh; do bash -n "$f"; done
+      - name: ShellCheck
+        run: cd .claude/scripts && shellcheck -x -S warning *.sh lib/common.sh

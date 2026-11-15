@@ -18,6 +18,11 @@ log "Generando informe $REPORT"
   echo "## Sockets en escucha (todo el sistema)"
   echo '```'; cat "$LOGS/listening.txt"; echo '```'
   echo
+  if [ -s "$LOGS/firewall.txt" ]; then
+    echo "## Cortafuegos de aplicación"
+    echo '```'; cat "$LOGS/firewall.txt"; echo '```'
+    echo
+  fi
   if [ -s "$LOGS/owners.txt" ]; then
     echo "## Dueño de los puertos abiertos (puerto proceso pid dirección exposición)"
     echo '```'; cat "$LOGS/owners.txt"; echo '```'

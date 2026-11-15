@@ -10,9 +10,11 @@ else
   A="${1%/}"; B="${2%/}"
 fi
 echo "A: $A"; echo "B: $B"
-for f in ncat_ports.txt owners.txt; do
+for f in ncat_ports.txt owners.txt listening.txt; do
   [ -e "$A/logs/$f" ] || [ -e "$B/logs/$f" ] || continue
   echo "== $f"
+  [ -e "$A/logs/$f" ] || { echo "(sin fichero en A)"; continue; }
+  [ -e "$B/logs/$f" ] || { echo "(sin fichero en B)"; continue; }
   diff -u "$A/logs/$f" "$B/logs/$f" 2>&1 | tail -n +3 || true
   diff -q "$A/logs/$f" "$B/logs/$f" >/dev/null 2>&1 && echo "(sin cambios)"
 done

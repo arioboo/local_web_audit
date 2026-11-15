@@ -12,6 +12,8 @@ Pruebas de pentesting ligero y revisión del estado de la web local, en macOS (D
 ## Estructura
 ```
 AGENTS.md            fuente única de instrucciones (CLAUDE.md solo contiene `@AGENTS.md`)
+latest_report.md     symlink relativo → .claude/reports/latest/report.md (último informe; sigue a `latest`)
+latest_recommendations.md  symlink relativo → .claude/reports/latest/recommendations.md (recomendaciones del último run)
 README.md            descripción mínima; está truncado al final (`<d`)
 localhost/           notas y pruebas manuales de loopback (vacía)
 lan/  web/           reservadas, vacías, fuera de alcance
@@ -30,7 +32,7 @@ lan/  web/           reservadas, vacías, fuera de alcance
 .claude/scripts/audit.sh                          # 127.0.0.1, puertos por defecto
 .claude/scripts/audit.sh localhost 3000,8080      # puertos concretos (lista CSV, no rangos)
 .claude/scripts/audit.sh 127.0.0.1 3000 --diff --containers
-cat .claude/reports/latest/report.md              # leer el último informe
+cat latest_report.md                              # leer el último informe (symlink en la raíz)
 tail -f .claude/reports/latest/logs/audit.log     # log de ejecución
 .claude/scripts/diff_runs.sh [RUN_A RUN_B]        # cambios de exposición (por defecto, los dos últimos)
 # verificación (no hay tests): sintaxis y lint
@@ -76,6 +78,20 @@ Inventario completo con rutas y comprobación de `PATH`: `.claude/notes/tools.md
 - «Cabeceras de seguridad ausentes» solo tiene sentido con respuestas reales; las 403 vacías las disparan todas.
 - `timing_https.txt` con `code=000` y 5 s = el puerto no habla TLS; esperado en HTTP plano.
 - Con una app real revisar además: `Server`/`X-Powered-By`, `TRACE` ≠ 405/403, métodos de escritura en `Allow`, cookies sin `HttpOnly`/`Secure`/`SameSite`, CORS `*` o que refleje el `Origin`, listado de directorios.
+
+## Procedimiento «recomienda»
+Cuando el usuario pida recomendaciones (solo lectura; no ejecuta nada nuevo contra la red):
+1. Leer `latest_report.md` y, si hace falta, la evidencia cruda de `.claude/reports/latest/logs/`. Si no hay informe, o es antiguo respecto a lo que se pregunta, ofrecer ejecutar `audit.sh` (solo loopback) en lugar de recomendar a ciegas.
+2. Aplicar «Interpretar informes»: descartar falsos positivos conocidos (AirPlay 5000/7000, 403 uniforme, `code=000` en HTTPS sin TLS) y decir que se descartan, no omitirlos.
+3. Comparar con el run anterior (`logs/diff_prev.txt` o `diff_runs.sh`) y destacar lo nuevo o lo que ha cambiado.
+4. Escribir `.claude/reports/latest/recommendations.md` (en español, Markdown) con estas secciones:
+   - **Resumen**: run analizado, objetivo y veredicto en una frase.
+   - **Recomendaciones**: tabla `Prioridad (Alta/Media/Baja) | Hallazgo | Evidencia (fichero de logs) | Acción | Esfuerzo`, ordenada por prioridad. Una exposición a la LAN o un 200/301/302 en `/.env`, `/.git/*` o `/admin` es Alta; cabeceras o cookies, Media; el resto, Baja.
+   - **Falsos positivos descartados**.
+   - **Fuera de alcance / pendiente**: lo que requeriría tocar algo que no sea loopback, instalar herramientas o `sudo` (solo mencionarlo, pedir confirmación antes de hacerlo).
+5. Cada recomendación cita su evidencia y propone una acción concreta y reversible; no aplicar cambios de configuración del sistema sin que el usuario lo pida.
+6. Comprobar que el symlink `latest_recommendations.md` de la raíz resuelve (`ls -lL`); recrearlo con `ln -sfn .claude/reports/latest/recommendations.md latest_recommendations.md` si falta. No commitear `reports/` (ignorado por git).
+7. Responder con un resumen corto y la ruta `latest_recommendations.md`, sin repetir el fichero entero.
 
 ## Convenciones al editar
 - Bash compatible con 3.2, con `set -u` y **sin** `-e` (una herramienta que falle no debe abortar el resto). Con `set -u`, no expandir arrays posiblemente vacíos (`"${A[@]}"`); leer listas de ficheros con `while read … <&3`.

@@ -7,7 +7,7 @@ HOST="${1:?uso: nse.sh HOST PUERTO LOGS_DIR}"; PORT="${2:?}"; LOGS="${3:?}"
 require_loopback "$HOST"; validate_ports "$PORT"
 D="$LOGS/port_$PORT"; mkdir -p "$D"
 
-SCRIPTS="http-title,http-server-header,http-headers,http-security-headers,http-methods,http-cors,http-cookie-flags,http-robots.txt,http-git,http-config-backup,ssl-cert,ssl-enum-ciphers,ssl-heartbleed"
+SCRIPTS="+http-title,+http-server-header,+http-headers,+http-security-headers,+http-methods,+http-cors,+http-cookie-flags,+http-robots.txt,+http-git,+http-config-backup,+ssl-cert,+ssl-enum-ciphers,+ssl-heartbleed"
 NMAP=(-Pn); case "$HOST" in *:*) NMAP+=(-6) ;; esac
 
 log "Puerto $PORT: nmap NSE (solo lectura)"

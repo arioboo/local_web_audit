@@ -14,7 +14,8 @@ Pruebas de pentesting ligero y revisión del estado de la web local, en macOS (D
 AGENTS.md            fuente única de instrucciones (CLAUDE.md solo contiene `@AGENTS.md`)
 latest_report.md     symlink relativo → .claude/reports/latest/report.md (último informe; sigue a `latest`)
 latest_recommendations.md  symlink relativo → .claude/reports/latest/recommendations.md (recomendaciones del último run)
-README.md            descripción mínima; está truncado al final (`<d`)
+requirements.txt    sin dependencias de pip (solo comentarios); las herramientas de sistema están en «Herramientas»
+README.md            guía de usuario (alcance, uso, cómo leer el informe); mantenerla alineada con este fichero
 localhost/           notas y pruebas manuales de loopback (vacía)
 lan/  web/           reservadas, vacías, fuera de alcance
 .claude/
@@ -45,15 +46,15 @@ Puertos por defecto: `80,443,3000,5000,5173,7000,8000,8080,8443`. Un run tarda ~
 
 | Script | Argumentos | Qué hace / salida en `logs/` |
 |---|---|---|
-| `sockets.sh` | `LOGS` | sockets en escucha de todo el sistema: `listening.txt`, `netstat_listen.txt` |
+| `sockets.sh` | `LOGS` | sockets en escucha de todo el sistema y estado del cortafuegos: `listening.txt`, `netstat_listen.txt`, `firewall.txt` |
 | `ports.sh` | `HOST PUERTOS LOGS` | `ncat -z` + nmap: `ncat_ports.txt`, `open_ports.txt`, `nmap_*.txt` |
 | `owners.sh` | `LOGS` | proceso dueño y exposición (`EXPUESTO` vs `loopback`): `owners.txt` |
 | `containers.sh` | `LOGS` | Docker con puertos publicados (opcional, `--containers`): `containers.txt` |
 | `http.sh` | `HOST PUERTO LOGS` | `port_N/`: banner, cabeceras, `scheme.txt` (`http`, `https` o `none`: primer esquema que respondió), `methods.txt` (GET/HEAD/OPTIONS/TRACE + `Allow`) y `paths.txt`, ambos solo por ese esquema |
 | `tls.sh` | `HOST PUERTO LOGS` | certificado en `port_N/tls_cert.txt`; solo si https respondió (requiere `http.sh`) |
 | `cookies_cors.sh` | `HOST PUERTO LOGS` | `port_N/web_checks.txt`: versión, cookies (atributos, no el nombre), CORS, redirecciones; usa `scheme.txt` (requiere `http.sh`) |
-| `nse.sh` | `HOST PUERTO LOGS` | nmap con lista blanca NSE de solo lectura: `port_N/nse.txt` |
-| `diff_runs.sh` | `[A B]` | diferencias entre runs (opcional, `--diff`): `diff_prev.txt` |
+| `nse.sh` | `HOST PUERTO LOGS` | nmap con lista blanca NSE de solo lectura (con `+`, se fuerzan aunque nmap no vea http): `port_N/nse.txt` |
+| `diff_runs.sh` | `[A B]` | diferencias (`ncat_ports`, `owners`, `listening`) entre runs (opcional, `--diff`): `diff_prev.txt` |
 | `report.sh` | `RUN_DIR HOST PUERTOS` | arma `report.md` a partir de `logs/` |
 
 `lib/common.sh` (se carga con `.`) ofrece `log`, `require_loopback`, `validate_ports` (lista CSV 1-65535, sin ceros a la izquierda) y `url_host` (IPv6 entre corchetes). Cada script se puede ejecutar por separado y revalida host y puertos. `report.sh` depende de los nombres de fichero de `logs/port_N/`: una comprobación nueva debe escribir ahí y añadir su sección a `report.sh`.
@@ -107,4 +108,3 @@ Cuando el usuario pida recomendaciones (solo lectura; no ejecuta nada nuevo cont
 - Hallazgos de revisión aún sin arreglar: `tls.sh` sin timeout ni comprobación previa, `owners.sh` omite puertos que `lsof` no ve, cabecera de `audit.sh` desactualizada, regla `ask` de `audit.sh` que tapa los `allow`, solapamiento de `nse.sh` con otros scripts.
 - Integrar `testssl.sh`/`sslscan`/`nikto` en `audit.sh` (opcionales por flag).
 - Modo `--watch` con `ncat`/`cron` para disponibilidad periódica en `.claude/reports/uptime.log`.
-- Completar el `README.md`.

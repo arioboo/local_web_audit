@@ -119,7 +119,7 @@ When the user asks for recommendations (read-only; runs nothing new against the 
 - The container artifact gathers every report, recommendation and guide in one page (URL in `.claude/notes/artifact.md`, private).
 - `/bundle` rebuilds it: run `bundle.py`, republish `.claude/reports/bundle.html` to that URL, then **always open the local HTML file** (`open .claude/reports/bundle.html`), not just the link.
 - Adding a guide or recommendation: write the `.md` in `.claude/recommendations/` (Spanish), then run `/bundle`. New groups need an `add(...)` line in `bundle.py`.
-- `guia_gh_github.md` covers `gh` login, branches, PRs, issues, Actions and repo safety; `gh` has no session on this machine until the user runs `! gh auth login`.
+- `guia_gh_github.md` covers `gh` login, branches, PRs, issues, Actions and repo safety; `gh` is logged in as `arioboo` (scopes `repo`, `read:org`, `gist`); if the session expires, the user runs `! gh auth login`.
 
 ## Pending
 - First real audit: follow `.claude/notes/first-audit-checklist.md`.

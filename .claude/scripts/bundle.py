@@ -45,6 +45,7 @@ secs=[]
 def add(group,sid,title,path):
     secs.append((group,sid,title,md(open(path).read())))
 add('Guías','guia-gh-github','Guía de gh y GitHub',f'{ROOT}/recommendations/guia_gh_github.md')
+add('Guías','router-servers','Guía de NAS, DLNA y FTP',f'{ROOT}/recommendations/router_servers.md')
 add('Recomendaciones','toolset','Toolset de mejora',f'{ROOT}/recommendations/toolset.md')
 add('Recomendaciones','indice','Índice de recomendaciones',f'{ROOT}/recommendations/README.md')
 runs=sorted([d for d in glob.glob(f'{ROOT}/reports/2*') if os.path.isdir(d)],reverse=True)

@@ -3,12 +3,12 @@
 Guía corta para este repo (`arioboo/local_web_audit`, rama de trabajo `develop`, remoto `origin` por SSH). Los comandos que escriben en GitHub (`push`, `pr create`, `repo create`) están en `ask` en `settings.json`: Claude pide confirmación antes de lanzarlos.
 
 ## 1. Iniciar sesión (una vez)
-`gh` aún no tiene sesión en esta máquina. Escribe en el prompt de Claude Code:
+Ya hay sesión iniciada como `arioboo` (2026-11-15, scopes `repo`, `read:org`, `gist`). Si caduca o cambias de máquina, escribe en el prompt de Claude Code:
 
 ```
 ! gh auth login
 ```
-Elige GitHub.com, protocolo SSH y entrar con el navegador. Comprueba con `gh auth status`. El `push` ya funciona por SSH sin `gh`; la sesión hace falta para PRs, issues, Actions y crear repos.
+Elige GitHub.com y entrar con el navegador (código de un solo uso). Comprueba con `gh auth status`. El `push` va por SSH (remoto `origin`) y no depende de `gh`; la sesión hace falta para PRs, issues, Actions y crear repos.
 
 ## 2. Flujo de ramas
 - `main`: estable. `develop`: trabajo diario. Ramas cortas para cambios concretos: `feat/...`, `fix/...`, `chore/...` (en inglés).
